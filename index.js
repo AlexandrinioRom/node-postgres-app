@@ -10,11 +10,12 @@ const parser = express.urlencoded({ extended: false });
 const PORT = process.env.PORT ?? 5000
 
 const app = express()
-
+app.use(parser)
 app.use(express.json())
 app.use(express.static(path.join(__dirname, 'static')))
-app.use('/', parser, authRouter)
-app.use('/', parser, userRouter)
+app.use('/auth', authRouter)
+app.use('/user', userRouter)
+
 
 async function start() {
   try {
