@@ -4,7 +4,6 @@ const CryptoJS = require("crypto-js")
 const jwt = require('jsonwebtoken')
 const db = require('../models')
 
-
 const generateAccessToken = (id) => {
   const secret = process.env.SECRET_JWT
   const payload = {
@@ -39,7 +38,7 @@ class AuthController {
           dob: dob
         })
         console.log(`Created new user with email: ${newUser.email}`)
-        res.json(`Hello, ${fullName}`)
+        res.status(200).json({ message: `Created new user with email: ${newUser.email}` })
       }
 
     } catch (e) {
@@ -55,7 +54,7 @@ class AuthController {
       } = req.body
 
       const user = await db.User.findOne({ where: { email: email } })
-      if (!user) {
+      if (user == null) {
         return res.status(400).json('This user not exist')
       }
 
