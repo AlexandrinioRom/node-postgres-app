@@ -4,19 +4,21 @@ class UserController {
 
   async getUsers(req, res) {
     try {
+
       const users = await db.User.findAll()
-      res.status(200).json(users)
-      console.log(`findUsers was colled`)
       if (users.length === 0) {
         return res.status(400).json({ message: 'Users list is empty' })
       }
+      res.status(200).json(users)
+      console.log(`findUsers was colled`)
+
     } catch (e) {
       console.log(e)
       res.status(400).json({ message: 'Get users error' })
     }
   }
   async updateUser(req, res) {
-    const { email, fullName, dob } = req.body
+    const { email, fullName } = req.body
     try {
       const user = await db.User.findOne({ where: { email: email } })
       if (user == null) {

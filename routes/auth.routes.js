@@ -7,7 +7,7 @@ const authRouter = new Router()
 authRouter.post('/registration', [
   check('fullName', "This field cannot be a number and his length should be more then one")
     .notEmpty()
-    .isAlpha(('en-US', 'ru-RU'), { ignore: '\s' })
+    .isAlpha('en-US', { ignore: '\s' })
     .isLength({ min: 2 }),
   check('dob', "Invalid Date of Birth")
     .isDate({ format: 'DD.MM.YYYY', delimiters: ['/', '.'] })

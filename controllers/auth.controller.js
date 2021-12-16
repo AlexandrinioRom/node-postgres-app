@@ -2,6 +2,7 @@ const secretPassword = String(process.env.SECRET_PASSWORD)
 const { validationResult } = require('express-validator')
 const CryptoJS = require("crypto-js")
 const jwt = require('jsonwebtoken')
+const moment = require('moment')
 const db = require('../models')
 
 const generateAccessToken = (id) => {
@@ -9,7 +10,7 @@ const generateAccessToken = (id) => {
   const payload = {
     id
   }
-  return jwt.sign(payload, secret, { expiresIn: "24h" })
+  return jwt.sign(payload, secret, { expiresIn: "1m" })
 }
 
 class AuthController {
@@ -35,7 +36,7 @@ class AuthController {
           fullName: fullName,
           email: email,
           password: hashedPassword,
-          dob: dob
+          dob: moment(dob, 'YYYY-MM-DD')
         })
         console.log(`Created new user with email: ${newUser.email}`)
         res.status(200).json({ message: `Created new user with email: ${newUser.email}` })
@@ -64,7 +65,7 @@ class AuthController {
       if (decryptedPassword != password) {
         return res.status(400).json(`Invalid password`)
       }
-      const token = generateAccessToken(user._id)
+      const token = generateAccessToken(user.id)
       return res.json({ token })
 
     } catch (e) {
