@@ -1,3 +1,5 @@
+const { tokenChecking } = require('../middleware/user.middleware')
+
 const authController = require('../controllers/auth.controller')
 const Router = require('express')
 const { check } = require('express-validator')
@@ -6,11 +8,10 @@ const authRouter = new Router()
 
 authRouter.post('/registration', [
   check('fullName', "This field cannot be a number and his length should be more then one")
-    .notEmpty()
-    .isAlpha('en-US', { ignore: '\s' })
+    .notEmpty({ ignore_whitespace: true })
     .isLength({ min: 2 }),
   check('dob', "Invalid Date of Birth")
-    .isDate({ format: 'DD.MM.YYYY', delimiters: ['/', '.'] })
+    .isDate({ delimiters: ['/', '.', '-'] })
     .isBefore(String(new Date().getFullYear() - 10))
     .isAfter(String(new Date().getFullYear() - 65)),
   check('email', "Invalid email")
@@ -20,6 +21,7 @@ authRouter.post('/registration', [
   check('password', "Password length must be between 4 and 8 characters")
     .isLength({ min: 4, max: 10 }),
 ], authController.registration)
+
 authRouter.post('/login', authController.login)
 
 module.exports = authRouter

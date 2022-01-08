@@ -13,5 +13,6 @@ userRouter.put('/',
   tokenChecking, userController.updateUser)
 userRouter.get('/', tokenChecking, userController.getUsers)
 userRouter.delete('/', tokenChecking, userController.deleteUser)
+userRouter.get('/tokencheck', tokenChecking, userController.check)
 
 module.exports = userRouter

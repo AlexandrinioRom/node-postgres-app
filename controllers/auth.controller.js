@@ -16,9 +16,14 @@ const generateAccessToken = (id) => {
 class AuthController {
   async registration(req, res) {
     try {
-      const errors = validationResult(req)
+
+      const errorFormatter = ({ msg }) => {
+        return `${msg}`
+      }
+      const errors = validationResult(req).formatWith(errorFormatter)
       if (!errors.isEmpty()) {
-        return res.status(400).json({ message: 'Registration error', errors })
+
+        return res.status(400).json({ errors: errors.array() })
       }
       const {
         password,
@@ -28,7 +33,8 @@ class AuthController {
       } = req.body
       const user = await db.User.findOne({ where: { email: email } })
       if (user) {
-        res.status(400).json('This user alredy exist')
+        res.status(400).json({ errors: ['This user alredy exist'] })
+        console.log('This user alredy exist')
       } else {
 
         const hashedPassword = String((CryptoJS.AES.encrypt(password, secretPassword)))
@@ -39,12 +45,14 @@ class AuthController {
           dob: moment(dob, 'YYYY-MM-DD')
         })
         console.log(`Created new user with email: ${newUser.email}`)
-        res.status(200).json({ message: `Created new user with email: ${newUser.email}` })
+        const user = await db.User.findOne({ where: { email: email } })
+        const token = generateAccessToken(user.id)
+        return res.json({ token })
       }
 
     } catch (e) {
       console.log(e)
-      res.status(400).json({ message: 'Registration error' })
+      res.status(400).json('Registration error')
     }
   }
   async login(req, res) {
@@ -65,12 +73,14 @@ class AuthController {
       if (decryptedPassword != password) {
         return res.status(400).json(`Invalid password`)
       }
+
+
       const token = generateAccessToken(user.id)
-      return res.json({ token })
+      return res.status(200).json({ token, user: user.id })
 
     } catch (e) {
       console.log(e)
-      res.status(400).json({ message: 'login error' })
+      res.status(400).json('login error')
     }
   }
 }
