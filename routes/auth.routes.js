@@ -1,5 +1,3 @@
-const { tokenChecking } = require('../middleware/user.middleware')
-
 const authController = require('../controllers/auth.controller')
 const Router = require('express')
 const { check } = require('express-validator')
@@ -21,7 +19,6 @@ authRouter.post('/registration', [
   check('password', "Password length must be between 4 and 8 characters")
     .isLength({ min: 4, max: 10 }),
 ], authController.registration)
-
 authRouter.post('/login', authController.login)
 
 module.exports = authRouter

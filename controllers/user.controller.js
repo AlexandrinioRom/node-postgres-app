@@ -4,7 +4,6 @@ class UserController {
 
   async getUsers(req, res) {
     try {
-
       const users = await db.User.findAll()
       if (users.length === 0) {
         return res.status(400).json('Users list is empty')
@@ -17,38 +16,43 @@ class UserController {
       res.status(400).json('Get users error')
     }
   }
+
+
   async updateUser(req, res) {
     const { email, fullName } = req.body
     try {
-      const user = await db.User.findOne({ where: { email: email } })
-      if (user == null) {
-        return res.status(400).json('This user not exist')
+
+      const user = await db.User.findOne({ where: { id: req.user.id } })
+      const userWithSameEmail = await db.User.findOne({ where: { email: email } })
+
+      if (userWithSameEmail && user.id !== userWithSameEmail.id) {
+
+        return res.status(400).json('This email already taken')
       }
       const errors = validationResult(req)
       if (!errors.isEmpty()) {
         return res.status(400).json('Registration error', errors)
       }
-      const oldName = user.fullName
+
       await user.update(
         {
           fullName: fullName,
+          email: email
         },
         {
           where: {
-            email: email
+            id: req.user.id
           }
         })
-      if (oldName == fullName) {
 
-        return res.status(200).json('You must change the params for update the user')
-      }
-      res.status(200).json(`${user.email} was update`)
-
+      res.status(200).json(user.id)
     } catch (e) {
       console.log(e);
       res.status(400).json('Update user error')
     }
   }
+
+
   async deleteUser(req, res) {
     const { email } = req.body
     try {
@@ -65,11 +69,16 @@ class UserController {
       res.status(400).json('Delete error')
     }
   }
+
+
   async check(req, res) {
     try {
+      const user = await db.User.findOne({ where: { id: req.user.id } })
+      console.log(user.id);
+      return res.status(200).json(user.id)
 
-      return res.status(200).json(req.user.id)
     } catch (error) {
+      console.log(error);
       res.status(400).json(error)
     }
   }
