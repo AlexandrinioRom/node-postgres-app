@@ -82,6 +82,25 @@ class UserController {
       res.status(400).json(error)
     }
   }
+
+  async getUser(req, res) {
+    try {
+      const user = await db.User.findOne({ where: { id: req.params['id'] } })
+      console.log(req.params['id']);
+
+      return res.status(200).json({
+
+        dob: user.dob,
+        email: user.email,
+        fullName: user.fullName
+
+      })
+
+    } catch (error) {
+      console.log(error);
+      res.status(400).json(error)
+    }
+  }
 }
 
 module.exports = new UserController()

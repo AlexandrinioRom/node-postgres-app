@@ -10,7 +10,7 @@ const generateAccessToken = (id) => {
   const payload = {
     id
   }
-  return jwt.sign(payload, secret, { expiresIn: "1m" })
+  return jwt.sign(payload, secret, { expiresIn: "30s" })
 }
 
 class AuthController {
@@ -74,9 +74,8 @@ class AuthController {
         return res.status(400).json(`Invalid password`)
       }
 
-
       const token = generateAccessToken(user.id)
-      return res.status(200).json({ token, user: user.id })
+      return res.status(200).json({ token, id: user.id })
 
     } catch (e) {
       console.log(e)
