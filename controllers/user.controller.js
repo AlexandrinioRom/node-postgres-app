@@ -19,25 +19,22 @@ class UserController {
 
 
   async updateUser(req, res) {
-    const { email, fullName } = req.body
+    const { fullName, dob } = req.body
     try {
 
       const user = await db.User.findOne({ where: { id: req.user.id } })
-      const userWithSameEmail = await db.User.findOne({ where: { email: email } })
 
-      if (userWithSameEmail && user.id !== userWithSameEmail.id) {
-
-        return res.status(400).json('This email already taken')
-      }
       const errors = validationResult(req)
       if (!errors.isEmpty()) {
         return res.status(400).json('Registration error', errors)
       }
+      console.log(dob);
 
       await user.update(
         {
+          dob: dob,
           fullName: fullName,
-          email: email
+
         },
         {
           where: {
@@ -45,7 +42,14 @@ class UserController {
           }
         })
 
-      res.status(200).json(user.id)
+      res.status(200).json({
+        id: user.id,
+        fullName: user.fullName,
+        dob: user.dob,
+        email: user.email
+      })
+
+      console.log(user.dob);
     } catch (e) {
       console.log(e);
       res.status(400).json('Update user error')
@@ -70,30 +74,14 @@ class UserController {
     }
   }
 
-
   async check(req, res) {
     try {
       const user = await db.User.findOne({ where: { id: req.user.id } })
-      console.log(user.id);
-      return res.status(200).json(user.id)
-
-    } catch (error) {
-      console.log(error);
-      res.status(400).json(error)
-    }
-  }
-
-  async getUser(req, res) {
-    try {
-      const user = await db.User.findOne({ where: { id: req.params['id'] } })
-      console.log(req.params['id']);
-
       return res.status(200).json({
-
+        id: user.id,
+        fullName: user.fullName,
         dob: user.dob,
-        email: user.email,
-        fullName: user.fullName
-
+        email: user.email
       })
 
     } catch (error) {
@@ -101,6 +89,7 @@ class UserController {
       res.status(400).json(error)
     }
   }
+
 }
 
 module.exports = new UserController()

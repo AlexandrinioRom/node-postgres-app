@@ -10,7 +10,7 @@ const generateAccessToken = (id) => {
   const payload = {
     id
   }
-  return jwt.sign(payload, secret, { expiresIn: "30s" })
+  return jwt.sign(payload, secret, { expiresIn: "10m" })
 }
 
 class AuthController {
@@ -75,7 +75,15 @@ class AuthController {
       }
 
       const token = generateAccessToken(user.id)
-      return res.status(200).json({ token, id: user.id })
+      return res.status(200).json({
+        token,
+        info: {
+          id: user.id,
+          dob: user.dob,
+          email: user.email,
+          fullName: user.fullName
+        }
+      })
 
     } catch (e) {
       console.log(e)
